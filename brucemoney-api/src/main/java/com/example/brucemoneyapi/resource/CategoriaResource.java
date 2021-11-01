@@ -6,7 +6,6 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +21,9 @@ import com.example.brucemoneyapi.event.RecursoCriadoEvent;
 import com.example.brucemoneyapi.model.Categoria;
 import com.example.brucemoneyapi.repository.CategoriaRepository;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping("/categorias")
 public class CategoriaResource {
@@ -30,11 +32,8 @@ public class CategoriaResource {
 	 * #Status code: #2xx -> Sucesso #4xx -> Erro do cliente #5xx -> Erro no
 	 * serviço/servidor
 	 */
-
-	@Autowired
+	
 	private CategoriaRepository categoriaRepository;
-
-	@Autowired
 	private ApplicationEventPublisher publisher;
 
 	@GetMapping
