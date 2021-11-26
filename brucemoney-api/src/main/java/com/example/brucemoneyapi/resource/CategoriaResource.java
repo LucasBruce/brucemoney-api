@@ -1,7 +1,6 @@
 package com.example.brucemoneyapi.resource;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.brucemoneyapi.event.RecursoCriadoEvent;
 import com.example.brucemoneyapi.model.Categoria;
-import com.example.brucemoneyapi.repository.CategoriaRepository;
+import com.example.brucemoneyapi.service.CategoriaService;
 
 import lombok.AllArgsConstructor;
 
@@ -29,31 +28,31 @@ import lombok.AllArgsConstructor;
 public class CategoriaResource {
 
 	/*
-	 * #Status code: #2xx -> Sucesso #4xx -> Erro do cliente #5xx -> Erro no
-	 * serviço/servidor
+	 * #Status code: 
+	 * #2xx -> Sucesso 
+	 * #4xx -> Erro do cliente 
+	 * #5xx -> Erro no serviço/servidor
 	 */
 	
-	private CategoriaRepository categoriaRepository;
 	private ApplicationEventPublisher publisher;
+	private CategoriaService categoriaService;
 
 	@GetMapping
 	public List<Categoria> findAll() {
-		return this.categoriaRepository.findAll();
+		return this.categoriaService.listarCategorias();
 	}
 
 	@PostMapping
 	public ResponseEntity<Categoria> criar(@Valid @RequestBody Categoria categoria, HttpServletResponse response,
 			BindingResult result) {
-		Categoria categoriaSalva = categoriaRepository.save(categoria);
+		Categoria categoriaSalva = categoriaService.salvarCategoria(categoria);
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, categoriaSalva.getCodigo()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
 	}
 
 	@GetMapping("/{codigo}")
 	public ResponseEntity<Categoria> buscaPeloCodigo(@PathVariable Long codigo) {
-		Optional<Categoria> categoria = categoriaRepository.findById(codigo);
-		
-		
-         return categoria.isPresent() ? ResponseEntity.ok(categoria.get()) : ResponseEntity.notFound().build();
+		Categoria categoria = categoriaService.buscarCategoriaCodigo(codigo);
+         return ResponseEntity.ok(categoria);
 	}
 }

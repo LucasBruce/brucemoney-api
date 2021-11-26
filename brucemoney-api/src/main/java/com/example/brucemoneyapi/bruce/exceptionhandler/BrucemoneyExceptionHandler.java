@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.example.brucemoneyapi.service.exception.LancamentoNaoEncontradoException;
+import com.example.brucemoneyapi.service.exception.PessoaInexistenteOuInativaException;
+
 @ControllerAdvice
 public class BrucemoneyExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -66,6 +69,14 @@ public class BrucemoneyExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler({DataIntegrityViolationException.class})
 	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request){
 		String mensagemUsuario = messageSource.getMessage("recurso.operacao-nao-permitida", null, LocaleContextHolder.getLocale());
+		String mensagemDesenvolvedor = ExceptionUtils.getRootCauseMessage(ex);
+		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
+	
+	@ExceptionHandler({LancamentoNaoEncontradoException.class})
+	public ResponseEntity<Object> handleLancamentoNaoEncontradoException(PessoaInexistenteOuInativaException ex, WebRequest request) {
+		String mensagemUsuario = messageSource.getMessage("lancamento.nao-encontrado", null, LocaleContextHolder.getLocale());
 		String mensagemDesenvolvedor = ExceptionUtils.getRootCauseMessage(ex);
 		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);

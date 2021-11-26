@@ -1,5 +1,6 @@
 package com.example.brucemoneyapi.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
@@ -16,6 +17,14 @@ public class PessoaService {
 	@Autowired
 	private PessoaRepository pessoaRepository;
 
+	public List<Pessoa> listarPessoas(){
+		return this.pessoaRepository.findAll();
+	}
+	
+	public Pessoa salvarPessoa(Pessoa pessoa) {
+		return this.pessoaRepository.save(pessoa);
+	}
+	
 	public Pessoa atualizar(Long codigo, Pessoa pessoa) {
 		Pessoa pessoaSalva = this.buscarPessoaPeloCodigo(codigo);
 		BeanUtils.copyProperties(pessoa, pessoaSalva, "codigo");
@@ -32,11 +41,15 @@ public class PessoaService {
 
 	public Pessoa buscarPessoaPeloCodigo(Long codigo) {
 		Optional<Pessoa> pessoaBuscada = this.pessoaRepository.findById(codigo);
-		if(pessoaBuscada == null) {
+		if(!pessoaBuscada.isPresent()) {
 			throw new EmptyResultDataAccessException(1);
 		}
-		return pessoaBuscada.isPresent()? pessoaBuscada.get(): null;
+		return pessoaBuscada.get();
 		
+	}
+	
+	public void removerPessoa(Long codigo) {
+		this.pessoaRepository.deleteById(codigo);
 	}
 
 }

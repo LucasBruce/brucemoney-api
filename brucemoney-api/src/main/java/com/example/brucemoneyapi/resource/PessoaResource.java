@@ -37,30 +37,29 @@ public class PessoaResource {
 	private PessoaService pessoaService;
 
 	@GetMapping
-	public List<Pessoa> lista() {
-		List<Pessoa> pessoas = this.pessoaRepository.findAll();
-		return pessoas;
+	public List<Pessoa> listarPessoas() {
+		return this.pessoaService.listarPessoas();
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<Pessoa> criar(@Valid @RequestBody Pessoa pessoa, HttpServletResponse response,
 			BindingResult result) {
-		Pessoa pessoaSalvar = this.pessoaRepository.save(pessoa);
+		Pessoa pessoaSalvar = this.pessoaService.salvarPessoa(pessoa);
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, pessoaSalvar.getCodigo()));
 		return ResponseEntity.ok(pessoaSalvar);
 	}
 
 	@GetMapping("/{codigo}")
 	public ResponseEntity<Pessoa> buscarPessoa(@PathVariable Long codigo) {
-		Optional<Pessoa> pessoa = this.pessoaRepository.findById(codigo);
-		return pessoa.isPresent() ? ResponseEntity.ok(pessoa.get()) : ResponseEntity.notFound().build();
+		Pessoa pessoaAchada = this.pessoaService.buscarPessoaPeloCodigo(codigo);
+		return ResponseEntity.ok(pessoaAchada);		
 	}
 
 	@DeleteMapping("/{codigo}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long codigo) {
-		this.pessoaRepository.deleteById(codigo);
+		this.pessoaService.removerPessoa(codigo);
 	}
 
 	@PutMapping("/{codigo}")
